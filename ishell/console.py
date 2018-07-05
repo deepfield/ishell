@@ -7,11 +7,12 @@ from ishell import logger
 
 
 class Console(object):
-    def __init__(self, prompt="Prompt", prompt_delim=">"):
+    def __init__(self, prompt="Prompt", prompt_delim=">", exit_on_sigint=True):
         self.childs = {}
         self.prompt = prompt
         self.prompt_delim = prompt_delim
         self._exit = False
+        self.exit_on_sigint = exit_on_sigint
 
     def addChild(self, cmd):
         self.childs[cmd.name] = cmd
@@ -98,9 +99,16 @@ class Console(object):
                     break
                 else:
                     self.walk_and_run(input_)
-            except (KeyboardInterrupt, EOFError):
+            except EOFError:
                 print "exit"
                 break
+
+            except KeyboardInterrupt:
+                if self.exit_on_sigint:
+                    print "exit"
+                    break
+                else:
+                    pass
 
             except Exception:
                 print traceback.format_exc()
