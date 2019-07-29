@@ -1,10 +1,9 @@
 ishell
 ===
 
-[![Join the chat at https://gitter.im/italorossi/ishell](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/italorossi/ishell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 [![PyPI version](https://badge.fury.io/py/ishell.svg)](http://badge.fury.io/py/ishell)
-[![Downloads](https://pypip.in/download/ishell/badge.png)](https://pypi.python.org/pypi/ishell/)
+![Travis](https://api.travis-ci.org/italorossi/ishell.svg?branch=master)
+![Downloads](https://img.shields.io/pypi/dm/ishell.svg)
 
 Create an interactive shell with Python.
 
@@ -84,7 +83,7 @@ console.loop()
 ![Users arguments](http://i.imgur.com/YmoENgG.png)
 
 
-##### Conecting Commands
+##### Connecting Commands
 
 You can connect commands with each other to build a more verbose command line: (Press TAB to complete)
 
