@@ -73,7 +73,7 @@ class Console(object):
         print("Help:")
         for command_name in sorted(self.childs.keys()):
             print("%15s - %s" % (command_name, self.childs[command_name].help))
-        print
+        print()
 
     def exit(self):
         self._exit = True

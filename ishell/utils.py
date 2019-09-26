@@ -5,7 +5,7 @@ import ishell
 import readline
 
 
-def _print(msg):
+def _print(msg=""):
     line_buffer = readline.get_line_buffer()
     # Clearing prompt
     sys.stdout.write("\r")
