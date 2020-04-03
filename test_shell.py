@@ -1,6 +1,8 @@
 import unittest
 from ishell.console import Console
 from ishell.command import Command
+import io
+from contextlib import redirect_stdout
 
 class TestConsole(unittest.TestCase):
 
@@ -49,6 +51,58 @@ class TestCommand(unittest.TestCase):
         assert 'interface ' == candidates
         candidates = cmd1.complete('', 't', 0, run=False, full_line='configure t')
         assert 'terminal ' == candidates
+
+    def test_double_overlapping_completion(self):
+        """Command must complete with two overlapping options."""
+        cmd1 = Command('configure')
+        cmd2 = Command('terminal')
+        cmd2.run = lambda l: "terminal output"
+        cmd3 = Command('terminal_1')
+        cmd3.run = lambda l: "terminal_1 output"
+        cmd1.addChild(cmd2)
+        cmd1.addChild(cmd3)
+        # State 0 must print all commands followed by help message
+        # and return None as candidates
+        candidates = cmd1.complete('', '', 0, run=False, full_line='configure ')
+        assert None == candidates
+        candidates = cmd1.complete('', 't', 0, run=False, full_line='configure t')
+        assert 'terminal ' == candidates
+        candidates = cmd1.complete('', 't', 1, run=False, full_line='configure t')
+        assert 'terminal_1 ' == candidates
+
+        # user pressing tab on ambiguous command
+        candidates = cmd1.complete(["terminal"], 'terminal', 0, run=False, full_line=None)
+        assert "terminal " == candidates
+        candidates = cmd1.complete(["terminal"], 'terminal', 1, run=False, full_line=None)
+        assert "terminal_1 " == candidates
+
+        output = cmd1.complete(["terminal"], 'configure terminal', 0, run=True, full_line='configure terminal')
+        assert 'terminal output' == output
+        output = cmd1.complete(["terminal_1"], 'configure terminal_1', 0, run=True, full_line='configure terminal_1')
+        assert 'terminal_1 output' == output
+
+    def test_double_overlapping_nested_completion(self):
+        """Command must complete with two overlapping nested options."""
+        cmd1 = Command('configure')
+        cmd2 = Command('terminal')
+        cmd3 = Command('terminal_1')
+        cmd1.addChild(cmd2)
+        cmd1.addChild(cmd3)
+        cmd4 = Command("option")
+        cmd2.addChild(cmd4)
+        cmd3.addChild(cmd4)
+        cmd5 = Command("A")
+        cmd4.addChild(cmd5)
+        cmd6 = Command("B")
+        cmd4.addChild(cmd6)
+        
+        # show help for A, B (NOT terminal terminal_1)
+        with io.StringIO() as buf, redirect_stdout(buf):
+            output = cmd1.complete(["terminal", "option"], '', 0, run=False, full_line=None)
+            assert output == None
+            help_output = buf.getvalue()
+            assert help_output == '\rPossible Completions:\n\r  A               No help provided\n\r  B               No help provided\n'
+        
 
     def test_completion_with_buffer(self):
         """Command must complete correctly with buffer provided."""

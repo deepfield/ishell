@@ -47,8 +47,10 @@ class Command(Console):
             has_arg_completed = False
 
             candidates = self.get_candidates(next_command)
-            if candidates and len(candidates) > 1 and buf:
-                logger.debug("More than one candidate, not walking in %s" % buf)
+            # don't fail to run, or to complete, because an earlier command is a prefix of another
+            # also don't autocomplete ambiguous commands that aren't at the end of the line
+            if candidates and len(candidates) > 1 and buf and not run and len(line) < 2:
+                logger.debug("More than one candidate, not walking in %s: %s" % (buf, candidates))
                 return self._next_command(state, buf)
             elif candidates and next_command in candidates:
                 logger.debug("Found %s in childs, walking." % next_command)
