@@ -71,8 +71,9 @@ class Console(object):
 
     def print_childs_help(self):
         print("Help:")
+        pad = max([len(c) for c in self.childs.keys()], default=0)
         for command_name in sorted(self.childs.keys()):
-            print("%15s - %s" % (command_name, self.childs[command_name].help))
+            print(f"{command_name:>{pad}} - {self.childs[command_name].help}")
         print()
 
     def exit(self):

@@ -103,8 +103,9 @@ class Command(Console):
         if len(completions) > 2 and state == 0 and not buf:
             logger.debug("Showing all completions...")
             _print("Possible Completions:")
+            pad = max([len(c) for c in self.childs.keys()], default=0)
             for child in sorted(self.childs.keys()):
-                _print("  %s%s" % (child.ljust(16), self.childs[child].help))
+                _print("  %s %s" % (child.ljust(pad), self.childs[child].help))
             return None
         return completions[state]
 

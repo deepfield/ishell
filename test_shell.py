@@ -91,18 +91,25 @@ class TestCommand(unittest.TestCase):
         cmd4 = Command("option")
         cmd2.addChild(cmd4)
         cmd3.addChild(cmd4)
-        cmd5 = Command("A")
+        cmd5 = Command("Aaaa")
         cmd4.addChild(cmd5)
         cmd6 = Command("B")
         cmd4.addChild(cmd6)
-        
-        # show help for A, B (NOT terminal terminal_1)
+
+        # show help for A, B (NOT terminal terminal_1) tab complete
         with io.StringIO() as buf, redirect_stdout(buf):
             output = cmd1.complete(["terminal", "option"], '', 0, run=False, full_line=None)
-            assert output == None
+            assert output is None
             help_output = buf.getvalue()
-            assert help_output == '\rPossible Completions:\n\r  A               No help provided\n\r  B               No help provided\n'
-        
+            assert help_output == '\rPossible Completions:\n\r  Aaaa No help provided\n\r  B    No help provided\n'
+
+        # show help for A, B (NOT terminal terminal_1) enter
+        with io.StringIO() as buf, redirect_stdout(buf):
+            output = cmd1.complete(["terminal", "option"], 'terminal option', 0, run=True, full_line='terminal option')
+            assert output is None
+            help_output = buf.getvalue()
+            assert help_output == '\nIncomplete Command: terminal option\n\nHelp:\nAaaa - No help provided\n   B - No help provided\n\n'
+
 
     def test_completion_with_buffer(self):
         """Command must complete correctly with buffer provided."""
